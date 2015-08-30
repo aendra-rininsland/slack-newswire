@@ -1,0 +1,34 @@
+{
+  "name": "SlackNewswire",
+  "version": "0.0.1",
+  "description": "POSTs newswire stories to Slack via an incoming webhook.",
+  "license": "MIT",
+  "author": {
+    "name": "Ændrew Rininsland",
+    "email": "aendrew@aendrew.com"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha test",
+    "zip": "./node_modules/.bin/gulp zip"
+  },
+  "keywords": [
+    "newswire",
+    "xml",
+    "slack",
+    "webhooks"
+  ],
+  "dependencies": {
+    "xml2js": "^0.4.10"
+  },
+  "devDependencies": {
+    "aws-lambda-mock-context": "^0.2.0",
+    "aws-sdk": "^2.1.46",
+    "chai": "^3.2.0",
+    "decamelize": "^1.0.0",
+    "gulp": "^3.9.0",
+    "gulp-zip": "^3.0.2",
+    "mocha": "^2.2.5",
+    "sinon": "^1.15.4",
+    "sinon-chai": "^2.8.0"
+  }
+}
