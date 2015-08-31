@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha test",
-    "zip": "./node_modules/.bin/gulp zip"
+    "zip": "./node_modules/.bin/gulp zip",
+    "deploy": "./node_modules/.bin/gulp deploy"
   },
   "keywords": [
     "newswire",
@@ -19,6 +20,8 @@
   ],
   "dependencies": {
     "d3-scale": "^0.1.1",
+    "dotenv": "^1.2.0",
+    "request": "^2.61.0",
     "xml2js": "^0.4.10",
     "xml2js-xpath": "^0.4.4"
   },
@@ -27,9 +30,14 @@
     "aws-sdk": "^2.1.46",
     "chai": "^3.2.0",
     "decamelize": "^1.0.0",
+    "del": "^1.2.1",
+    "dotenv": "^1.2.0",
     "gulp": "^3.9.0",
+    "gulp-install": "^0.5.0",
     "gulp-zip": "^3.0.2",
     "mocha": "^2.2.5",
+    "node-aws-lambda": "^0.1.5",
+    "run-sequence": "^1.1.2",
     "sinon": "^1.15.4",
     "sinon-chai": "^2.8.0"
   }

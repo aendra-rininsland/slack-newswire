@@ -7,11 +7,15 @@
  * @since  30 Aug. 2015
  */
 
+require('dotenv').load();
+
 // module dependencies
 var xml2js = require('xml2js');
 var xpath = require('xml2js-xpath');
 var scale = require('d3-scale');
 var format = require('util').format;
+var request = require('request');
+var environment = process.env.NODE_ENV ? process.env.NODE_ENV : 'testing';
 
 /**
  * The handler function.
@@ -48,7 +52,7 @@ exports.handler = function(event, context) {
       fallback: format('%s [%d] -- %s', headline, priority, excerpt),
       color: color(priority),
       title: format('%s [%d]', headline, priority),
-      pretext: priority <= 3 ? '@everyone' : '',
+      pretext: priority <= (process.env.ALERT_PRIORITY || 3) ? '@everyone' : '', // Alert everyone for priorities above 3 (default)
       text: bodyCopy,
       author_name: byline,
       author_link: link,
@@ -101,6 +105,13 @@ exports.handler = function(event, context) {
       });
     }
     
-    context.succeed(payload);
+    // Send to Slack
+    if (environment === 'production' && process.env.hasOwnProperty('SLACK_WEBHOOK')) {
+      request.post({uri: process.env.SLACK_WEBHOOK, method: 'POST', json: payload}, function (error, response, body) {
+        context.succeed(body);
+      });
+    } else {
+      context.succeed(payload);
+    }
   });  
 };

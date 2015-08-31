@@ -1,37 +1,58 @@
 'use strict';
 
 /**
- * Tasks that will zip all the files so that the zip file can be deployed to 
- * AWS Lambda.
- * 
- * @author Ændrew Rininsland      <aendrew@aendrew.com>
- * @since  30 Aug. 2015
- */
+* Tasks that will zip all the files so that the zip file can be deployed to 
+* AWS Lambda.
+* 
+* @author Ændrew Rininsland      <aendrew@aendrew.com>
+* @since  30 Aug. 2015
+*/
 
-// module dependencies
-var gulp = require('gulp'),
-    zip = require('gulp-zip'),
-    decamelize = require('decamelize');
+require('dotenv').load();
+var gulp = require('gulp');
+var zip = require('gulp-zip');
+var del = require('del');
+var install = require('gulp-install');
+var runSequence = require('run-sequence');
+var awsLambda = require('node-aws-lambda');
 
-var pkg = require('./package.json');
+gulp.task('clean', function(callback) {
+  del(['./dist', './dist.zip'], callback);
+});
 
-/**
- * Creates a zip file
- */
+gulp.task('js', function() {
+  return gulp.src(['index.js'])
+  .pipe(gulp.dest('dist/'));
+});
+
+// Next copy over environment variables managed outside of source control.
+gulp.task('env', function() {
+  return gulp.src('./.env')
+  .pipe(gulp.dest('./dist'));
+});
+
+gulp.task('node-mods', function() {
+  return gulp.src('./package.json')
+  .pipe(gulp.dest('dist/'))
+  .pipe(install({production: true}));
+});
+
 gulp.task('zip', function() {
-    var name = decamelize(pkg.name);
-    
-    // Ignore all the dev dependencies and the bin folder
-    var ignoreModules = Object.keys(pkg.devDependencies);
-    ignoreModules.push('.bin');
-    
-    // Map the array to a list of globbing patterns
-    var ignore = ignoreModules.map(function(dep) {
-        return '!node_modules/{' + dep + ',' + dep + '/**}';
-    });
-    
-    // Zip the code
-    return gulp.src(['./**', '!README.md', '!.gitignore', '!gulpfile.js', '!./{dist,dist/**}', '!./{test,test/**}'].concat(ignore), {base: '.'})
-        .pipe(zip(name + '.zip'))
-        .pipe(gulp.dest('dist'));
+  return gulp.src(['dist/**/*', 'dist/.env', '!dist/package.json'])
+  .pipe(zip('dist.zip'))
+  .pipe(gulp.dest('./'));
+});
+
+gulp.task('upload', function(callback) {
+  return awsLambda.deploy('./dist.zip', require('./lambda-config.js'), callback);
+});
+
+gulp.task('deploy', function(callback) {
+  runSequence(
+    ['clean'],
+    ['js', 'node-mods', 'env'],
+    ['zip'],
+    ['upload'],
+    callback
+  );
 });
