@@ -18,7 +18,9 @@
     "webhooks"
   ],
   "dependencies": {
-    "xml2js": "^0.4.10"
+    "d3-scale": "^0.1.1",
+    "xml2js": "^0.4.10",
+    "xml2js-xpath": "^0.4.4"
   },
   "devDependencies": {
     "aws-lambda-mock-context": "^0.2.0",

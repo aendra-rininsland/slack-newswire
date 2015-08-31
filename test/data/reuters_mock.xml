@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+SUMMARY: 
+- Structure: NML2 SNI Text 
+- Based On: NML2 v2.10
+
+AUTHOR: thomsonreuters.com
+-->
+<!-- ========================================================= -->
+<newsMessage xmlns="http://iptc.org/std/nar/2006-10-01/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rtr="http://www.reuters.com/ns/2003/08/content" xmlns:x="http://www.w3.org/1999/xhtml">  
+  <header>    
+    <sent>2015-08-28T11:56:50.000Z</sent>    
+    <sender>reuters.com</sender>    
+    <transmitId>tag:reuters.com,0000:newsml_ABCDEFGH:123456789</transmitId>    
+    <priority>2</priority>    
+    <destination>G</destination>    
+    <destination>RBN</destination>    
+    <destination>AFA</destination>    
+    <destination>CSA</destination>    
+    <destination>LBY</destination>    
+    <destination>RWSA</destination>    
+    <destination>RWS</destination>    
+    <destination>REULB</destination>    
+    <destination>GNS</destination>    
+    <destination>RNP</destination>    
+    <destination>PGE</destination>    
+    <channel>TXT</channel>    
+  </header>  
+  <itemSet>    
+    <newsItem guid="tag:reuters.com,0000:newsml_ABCDEFGH" version="123456789" standard="NewsML-G2" standardversion="2.10" conformance="power" xml:lang="en">      
+      <catalogRef href="http://www.iptc.org/std/catalog/catalog.IPTC-G2-Standards_3.xml" />      
+      <rightsInfo>        
+        <copyrightHolder literal="Thomson Reuters" />        
+        <copyrightNotice xml:lang="en">(c) Copyright Thomson Reuters 2015. Click For Restrictions - http://about.reuters.com/fulllegal.asp</copyrightNotice>        
+      </rightsInfo>      
+      <itemMeta>        
+        <itemClass qcode="icls:text" rtr:msgType="S" />        
+        <provider literal="reuters.com" />        
+        <versionCreated>2015-08-28T11:56:50.000Z</versionCreated>        
+        <firstCreated>2015-08-28T11:56:50.000Z</firstCreated>        
+        <pubStatus qcode="stat:usable" />        
+        <role qcode="itemRole:N" />        
+        <fileName>reuters_mock.xml</fileName>        
+        <generator versioninfo="00.00.01">G3:IIM:FH</generator>        
+        <profile versioninfo="00.00.01">SNI-Text</profile>        
+        <service qcode="svc:RTR_TNS" />        
+        <memberOf creator="trRule:rule1" modified="2015-08-28T11:56:52.000Z" literal="Business">          
+          <name>Business</name>          
+        </memberOf>        
+        <memberOf creator="trRule:rule2" modified="2015-08-28T11:56:52.000Z" literal="Economy">          
+          <name>Economy</name>          
+        </memberOf>        
+        <memberOf creator="trRule:rule11" modified="2015-08-28T11:56:52.000Z" literal="Politics">          
+          <name>Politics</name>          
+        </memberOf>        
+        <memberOf creator="trRule:rule22" modified="2015-08-28T11:56:52.000Z" literal="World-Asia">          
+          <name>Asia</name>          
+        </memberOf>        
+        <memberOf creator="trRule:rule25" modified="2015-08-28T11:56:52.000Z" literal="World-Europe">          
+          <name>Europe</name>          
+        </memberOf>        
+        <memberOf creator="trRule:rule27" modified="2015-08-28T11:56:52.000Z" literal="World-MiddleEast">          
+          <name>Middle East</name>          
+        </memberOf>        
+        <signal qcode="edStat:N" />        
+        <signal qcode="prodId:TXT" />        
+        <signal qcode="pmt:text" />        
+        <rtr:versionedId guid="tag:reuters.com,0000:newsml_ABCDEFGH:123456789" />        
+      </itemMeta>      
+      <contentMeta>        
+        <urgency>2</urgency>        
+        <infoSource role="cRole:origProv" literal="Reuters" />        
+        <creator literal="Reuters" />        
+        <altId type="idType:USN" rtr:isOriginal="1">ABCDEFGH</altId>        
+        <altId type="idType:OTR">ABCDEFGH</altId>        
+        <language tag="en" />        
+        <subject qcode="MCC:OEC" />        
+        <subject qcode="N2:EUB" />        
+        <subject qcode="N2:DK" />        
+        <subject qcode="N2:SK" />        
+        <subject qcode="N2:AT" />        
+        <subject qcode="N2:BG" />        
+        <subject qcode="N2:RO" />        
+        <subject qcode="N2:WEU" />        
+        <subject qcode="N2:HU" />        
+        <subject qcode="N2:SY" />        
+        <subject qcode="N2:IT" />        
+        <subject qcode="N2:GR" />        
+        <subject qcode="N2:EUROP" />        
+        <subject qcode="N2:NEWS1" />        
+        <subject qcode="N2:IMM" />        
+        <subject qcode="N2:CRIM" />        
+        <subject qcode="N2:DIP" />        
+        <subject qcode="N2:JUDIC" />        
+        <subject qcode="N2:EU" />        
+        <subject qcode="N2:POL" />        
+        <subject qcode="N2:DE" />        
+        <subject qcode="N2:DBT" />        
+        <subject qcode="N2:NORD" />        
+        <subject qcode="N2:EMRG" />        
+        <subject qcode="N2:EZC" />        
+        <subject qcode="N2:CEEU" />        
+        <subject qcode="N2:EEU" />        
+        <subject qcode="N2:SEEU" />        
+        <subject qcode="N2:ASIA" />        
+        <subject qcode="N2:MEAST" />        
+        <subject qcode="N2:GEN" />        
+        <subject qcode="N2:CIV" />        
+        <subject qcode="N2:CLJ" />        
+        <subject qcode="UNK:INTAG" />        
+        <subject qcode="subj:04008003" />        
+        <subject qcode="subj:14003002" />        
+        <subject qcode="subj:02000000" />        
+        <subject qcode="subj:11002000" />        
+        <subject qcode="subj:02002000" />        
+        <subject qcode="subj:11000000" />        
+        <subject qcode="subj:10000000" />        
+        <subject qcode="subj:11007000" />        
+        <subject qcode="N2:SYR" />        
+        <subject qcode="N2:ROU" />        
+        <subject qcode="N2:GRC" />        
+        <subject qcode="N2:DEU" />        
+        <subject qcode="N2:AUT" />        
+        <subject qcode="N2:BGR" />        
+        <subject qcode="N2:SVK" />        
+        <subject qcode="N2:ITA" />        
+        <subject qcode="N2:DNK" />        
+        <subject qcode="N2:HUN" />        
+        <subject qcode="N2:PIA" />        
+        <subject qcode="N2:BACT" />        
+        <subject qcode="a1312cat:i" />        
+        <subject qcode="MCCL:OVR" />        
+        <subject qcode="MCCL:OEC" />        
+        <slugline separator="-">PLACE-TOPIC/SUBJECT (URGENT)</slugline>        
+        <headline>HEADLINE HEADLINE HEADLINE</headline>        
+        <creditline>Reuters</creditline>        
+        <description role="descRole:caption">PLACE-TOPIC/SUBJECT (URGENT):HEADLINE HEADLINE HEADLINE</description>        
+      </contentMeta>      
+      <contentSet>        
+        <inlineXML contenttype="application/xhtml+html" wordcount="2">          
+          <html xmlns="http://www.w3.org/1999/xhtml">            
+            <head>              
+              <title />              
+            </head>            
+            <body>              
+              <p>BODY COPY</p>              <p>(Reporting by FIRSTNAME LASTNAME; writing by FIRSTNAME LASTNAME; editing by FIRSTNAME LASTNAME)</p>              
+            </body>            
+          </html>          
+        </inlineXML>        
+      </contentSet>      
+    </newsItem>    
+  </itemSet>  
+  <NIMetaData>
+    <Property FormalName="NICategory" Title="TIM" Value="TIM_REDFLT"/>
+    <Property FormalName="NICategory" Title="STI" Value="STI_REDFLT"/>
+    <Property FormalName="NICategory" Title="SUN" Value="SUN_REDFLT"/>
+    <Property FormalName="NIMethodeName" Value="28RTURGENT"/>
+  </NIMetaData>
+</newsMessage>

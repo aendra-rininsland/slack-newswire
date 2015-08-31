@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NewsML>
+  <NewsEnvelope>
+    <SentFrom>
+      <Party FormalName="The Press Association"/>
+    </SentFrom>
+    <DateAndTime>20150828T130248+0100</DateAndTime>
+    <NewsService FormalName="Comprehensive"/>
+    <Priority FormalName="4"/>
+  </NewsEnvelope>
+  <NewsItem>
+    <Identification>
+      <NewsIdentifier>
+        <ProviderId>pa.press.net</ProviderId>
+        <DateId>20150828</DateId>
+        <NewsItemId>PA-HHH-POLICE-Collision</NewsItemId>
+        <RevisionId PreviousRevision="0" Update="N">1234567890</RevisionId>
+        <PublicIdentifier>urn:newsml:pa.press.net:20150828:PA-HHH-POLICE-Collision:1234567890</PublicIdentifier>
+      </NewsIdentifier>
+      <NameLabel>POLICE Collision</NameLabel>
+    </Identification>
+    
+    <NewsManagement>
+      <NewsItemType FormalName="News"/>
+      <FirstCreated>20150828T130248+0100</FirstCreated>
+      <ThisRevisionCreated>20150828T130248+0100</ThisRevisionCreated>
+      <Status FormalName="Usable"/>
+      <Urgency FormalName="4"/>
+    </NewsManagement>
+    
+    <NewsComponent>
+      <Role FormalName="Main"/>
+      <NewsLines>
+        <HeadLine>HEADLINE HEADLINE</HeadLine>
+        <ByLine>By FIRSTNAME LASTNAME, Press Association</ByLine>
+        <CopyrightLine>Press Association 2015</CopyrightLine>
+        <SlugLine>POLICE Collision</SlugLine>
+      </NewsLines>
+      
+      <AdministrativeMetadata>
+        <Provider>
+          <Party FormalName="The Press Association"/>
+        </Provider>
+      </AdministrativeMetadata>
+      
+      <RightsMetadata>
+        <Copyright>
+          <CopyrightHolder>Press Association</CopyrightHolder>
+          <CopyrightDate>2015</CopyrightDate>
+        </Copyright>
+      </RightsMetadata>
+      
+      <DescriptiveMetadata>
+        <Property FormalName="Category" Value="HHH"/>
+        <Property FormalName="Topic" Value="POLICE"/>
+        <Property FormalName="Keyword" Value="Collision"/>
+        <SubjectCode>
+          <Subject Scheme="IptcSubjectCodes" FormalName="02000000"/>
+          <SubjectMatter Scheme="IptcSubjectCodes" FormalName="02001000"/>
+          <SubjectDetail Scheme="IptcSubjectCodes" FormalName="04011002"/>
+        </SubjectCode>
+      </DescriptiveMetadata>
+      
+      <NewsComponent Duid="abcd1234">
+        <ContentItem>
+          <MediaType FormalName="Text"/>
+          <MimeType FormalName="text/vnd.IPTC.NITF"/>
+          <DataContent>
+            <nitf>
+              <body>
+                <body.content>
+                  <p>BODY COPY BODY COPY</p>
+                  <p>ends</p>
+                </body.content>
+              </body>
+            </nitf>
+          </DataContent>
+        </ContentItem>
+      </NewsComponent>
+    </NewsComponent>
+    
+  </NewsItem>
+  
+  <NIMetaData>
+    <Property FormalName="NICategory" Title="TIM" Value="TIM_PAHOME"/>
+    <Property FormalName="NICategory" Title="STI" Value="STI_PAHOME"/>
+    <Property FormalName="NICategory" Title="SUN" Value="SUN_PAHOME"/>
+    <Property FormalName="NIMethodeName" Value="28PACOLLISION1"/>
+  </NIMetaData>
+</NewsML>
