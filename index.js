@@ -52,7 +52,7 @@ exports.handler = function(event, context) {
       fallback: format('%s [%d] -- %s', headline, priority, excerpt),
       color: color(priority),
       title: format('%s [%d]', headline, priority),
-      pretext: priority <= (process.env.ALERT_PRIORITY || 3) ? '@everyone' : '', // Alert everyone for priorities above 3 (default)
+      pretext: priority <= (process.env.ALERT_PRIORITY || 3) ? '@channel' : '', // Alert everyone for priorities above 3 (default)
       text: bodyCopy,
       author_name: byline,
       author_link: link,
