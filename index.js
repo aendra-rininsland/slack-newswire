@@ -10,8 +10,7 @@
 require('dotenv').load();
 
 // module dependencies
-var xml2js = require('xml2js');
-var xpath = require('xml2js-xpath');
+var libxmljs = require('libxmljs');
 var scale = require('d3-scale');
 var format = require('util').format;
 var request = require('request');
@@ -24,104 +23,147 @@ var environment = process.env.NODE_ENV ? process.env.NODE_ENV : 'testing';
  * @param {object}  context     The AWS Lambda execution context.
  */
 exports.handler = function(event, context) {
+  var IPTC_NAMESPACE = 'http://iptc.org/std/nar/2006-10-01/';
+
+  /**
+   * Returns a string value for priorities
+   * @param  {integer} priority NewsML priority
+   * @return {string}          Parsed priority
+   */
+  function getPriority(priority) {
+    switch (parseInt(priority)) {
+      case 1:
+        return ':rotating_light: CRAZY-HIGH PRIORITY :rotating_light:';
+      case 2:
+        return ':rotating_light: Super high priority :rotating_light:';
+      case 3:
+        return 'High priority';
+      case 4:
+        return 'Medium priority';
+      case 5:
+        return 'Medium-low priority';
+      case 6:
+        return 'Low priority';
+      case 7:
+        return 'Lower priority';
+      case 8:
+        return 'Lowest priority';
+      default:
+        return 'Priority not set';
+
+    }
+  }
+
+  var color = scale.linear().domain([8, 3, 1]).range(['green', 'yellow', 'red']);
+
   /**
    * Parses an old NewsML XML file (Press Association)
    */
   function parseArticle(article, type, priority) {
-    var color = scale.linear().domain([8, 3, 1]).range(['green', 'yellow', 'red']);
-    var headline = xpath.evalFirst(article, '//headline');
-    var body = xpath.evalFirst(article, '//body');
-    var bodyCopy, excerpt, byline, link, newsitem;
+    var bodyCopy, excerpt, byline, link, newsitem, body, slugline, headline;
 
-    if (body.hasOwnProperty('body.content')) { // PA
-      excerpt = xpath.jsonText(body['body.content'][0].p[0]);
+    if (type === 'PA') {
+      headline = article.get('//HeadLine').text();
+      body = article.get('//body');
+      excerpt = body.get('//body.content').childNodes()[0].text();
       bodyCopy = '';
-
-      body['body.content'][0].p.forEach(function(v){
-        bodyCopy += xpath.jsonText(v) + '\n';
+      body.get('//body.content').childNodes().forEach(function(node){
+        bodyCopy += node.text() + '\n';
       });
-      byline = xpath.evalFirst(article, '//byline');
-
-      if (byline) {
-        byline.replace('By ', '');
-      }
-
+      byline = article.get('//ByLine').text();
+      slugline = article.get('//SlugLine').text();
       link = 'https://www.pressassociation.com/';
-      newsitem = xpath.evalFirst(article, '//newsitemid');
-    } else { // Reuters
-      excerpt = body.p[0];
-      bodyCopy = body.p.join('\n');
-      // var authors = body.p[body.p.length - 1];
+      newsitem = article.get('//NewsItemId').text();
+    } else if (type === 'Reuters') {
+      headline = article.get('//xmlns:headline', IPTC_NAMESPACE).text();
+      body = article.get('//xmlns:body', 'http://www.w3.org/1999/xhtml');
+      excerpt = body.childNodes()[0].text();
+      bodyCopy = '';
+      body.childNodes().forEach(function(node){
+        bodyCopy += node.text() + '\n';
+      });
       byline = 'Thomson Reuters'; // TODO write some regex to extract reporter's name.
       link = 'http://about.reuters.com/';
-      newsitem = article.$.guid.split(':')[2].replace('newsml_', '');
+      slugline = article.get('//xmlns:slugline', IPTC_NAMESPACE).text();
+      newsitem = article.attr('guid').value().split(':')[2].replace('newsml_', '');
+    }
+
+    if (byline) {
+      byline = byline.replace('By ', '');
     }
 
     return {
       fallback: format('%s [%d] -- %s', headline, priority, excerpt),
       color: color(priority),
-      title: format('%s [%d]', headline, priority),
-      pretext: priority <= (process.env.ALERT_PRIORITY || 3) ? '@channel' : '', // Alert everyone for priorities above 3 (default)
+      title: format('%s', headline),
+      pretext: undefined, //priority <= (process.env.ALERT_PRIORITY || 3) ? '@channel' : '', // Alert everyone for priorities above 3 (default)
       text: bodyCopy,
       author_name: byline,
       author_link: link,
       fields: [
         {
           title: 'slugline',
-          value: xpath.evalFirst(article, '//slugline', true)
+          value: slugline,
+          short: true
         },
         {
           title: 'Methode Name',
-          value: undefined
+          value: undefined,
+          short: true
         },
         {
           title: 'News Item ID',
-          value: newsitem
+          value: newsitem,
+          short: true
+        },
+        {
+          title: 'Priority',
+          value: getPriority(priority),
+          short: true
         }
       ]
     };
   }
 
-  xml2js.parseString(event.body, {normalizeTags: true}, function(err, xml){
-    var type;
-    var payload = {
-      text: String(),
-      attachments: []
-    };
+  var xml = libxmljs.parseXmlString(event.body, {noblanks: true});
+  var type;
+  var payload = {
+    text: String(),
+    attachments: []
+  };
 
-    var articles = xpath.find(xml, '//newsitem');
-    var priority = xpath.evalFirst(xml, '//priority');
-    var metadataProperties = xpath.find(xml, '//nimetadata/property');
-    var methode = metadataProperties.filter(function(v){
-      return v.$.FormalName === 'NIMethodeName';
-    })[0].$.Value;
+  var articles, priority, methode;
+  if (xml.root().name() === 'newsMessage') { // Reuters, expectedly, uses the modern version.
+    type = 'Reuters';
+    articles = xml.find('//xmlns:newsItem', IPTC_NAMESPACE);
+    priority = xml.get('//xmlns:priority', IPTC_NAMESPACE).text();
+    methode = xml.get('//xmlns:Property[@FormalName="NIMethodeName"]', IPTC_NAMESPACE).attr('Value').value();
+  } else if (xml.root().name() === 'NewsML') { // PA, regrettably, does not.
+    type = 'PA';
+    articles = xml.find('//NewsItem');
+    priority = xml.get('//Priority');
+    priority = priority.attr('FormalName').value();
+    methode = xml.get('//Property[@FormalName="NIMethodeName"]').attr('Value').value();
+  } else {
+    throw 'Not valid NewsML';
+  }
 
-    if (xml.hasOwnProperty('newsmessage')) { // Reuters, expectedly, uses the modern version.
-      type = 'Reuters';
-    } else if (xml.hasOwnProperty('newsml')) { // PA, regrettably, does not.
-      type = 'PA';
-      priority = priority.$.FormalName;
-    } else {
-      throw 'Not valid NewsML';
-    }
+  payload.type = type;
 
-    payload.type = type;
+  if (articles.length > 0) {
+    articles.forEach(function(article){
+      var parsed = parseArticle(article, type, priority);
+      parsed.fields[1].value = methode;
+      payload.attachments.push(parsed);
+    });
+  }
 
-    if (articles.length > 0) {
-      articles.forEach(function(article){
-        var parsed = parseArticle(article, type, priority);
-        parsed.fields[1].value = methode;
-        payload.attachments.push(parsed);
-      });
-    }
-
-    // Send to Slack
-    if (environment === 'production' && process.env.hasOwnProperty('SLACK_WEBHOOK')) {
-      request.post({uri: process.env.SLACK_WEBHOOK, method: 'POST', json: payload}, function (error, response, body) {
-        context.succeed(body);
-      });
-    } else {
-      context.succeed(payload);
-    }
-  });
+  // Send to Slack
+  if (environment === 'production' && process.env.hasOwnProperty('SLACK_WEBHOOK')) {
+    request.post({uri: process.env.SLACK_WEBHOOK, method: 'POST', json: payload}, function (error, response, body) {
+      context.succeed(body);
+    });
+  } else {
+    context.succeed(payload);
+  }
 };

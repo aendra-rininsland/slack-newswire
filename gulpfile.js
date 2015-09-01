@@ -1,9 +1,9 @@
 'use strict';
 
 /**
-* Tasks that will zip all the files so that the zip file can be deployed to 
+* Tasks that will zip all the files so that the zip file can be deployed to
 * AWS Lambda.
-* 
+*
 * @author Ændrew Rininsland      <aendrew@aendrew.com>
 * @since  30 Aug. 2015
 */

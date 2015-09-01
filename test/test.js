@@ -30,24 +30,26 @@ describe('SlackNewswire', function() {
     context.Promise
     .then(function(data) { // succeed() called
       assert(data.type === 'PA', 'Ensure type is PA.');
-      assert(data.attachments.length === 1, 'There is one article.')
+      assert(data.attachments.length === 1, 'There is one article.');
 
       var attachment = data.attachments[0];
       assert.propertyVal(attachment, 'fallback', 'HEADLINE HEADLINE [4] -- BODY COPY BODY COPY');
       assert.propertyVal(attachment, 'color', '#cce600');
-      assert.propertyVal(attachment, 'title', 'HEADLINE HEADLINE [4]');
-      assert.propertyVal(attachment, 'pretext', '');
-      assert.propertyVal(attachment, 'text', 'BODY COPY BODY COPY\nends');
+      assert.propertyVal(attachment, 'title', 'HEADLINE HEADLINE');
+      assert.propertyVal(attachment, 'pretext', undefined);
+      assert.propertyVal(attachment, 'text', 'BODY COPY BODY COPY\nends\n');
       assert.propertyVal(attachment, 'author_name', 'FIRSTNAME LASTNAME, Press Association');
       assert.propertyVal(attachment, 'author_link', 'https://www.pressassociation.com/');
       //assert.propertyVal(attachment, 'author_icon', '');
-      assert(attachment.fields.length === 3, 'Ensure there are two fields');
+      assert(attachment.fields.length === 4, 'Ensure there are four fields');
       assert.propertyVal(attachment.fields[0], 'title', 'slugline');
       assert.propertyVal(attachment.fields[0], 'value', 'POLICE Collision');
       assert.propertyVal(attachment.fields[1], 'title', 'Methode Name');
       assert.propertyVal(attachment.fields[1], 'value', '28PACOLLISION1');
       assert.propertyVal(attachment.fields[2], 'title', 'News Item ID');
       assert.propertyVal(attachment.fields[2], 'value', 'PA-HHH-POLICE-Collision');
+      assert.propertyVal(attachment.fields[3], 'title', 'Priority');
+      assert.propertyVal(attachment.fields[3], 'value', 'Medium priority');
       done();
     })
     .catch(function(err) { // fail() called
@@ -62,24 +64,26 @@ describe('SlackNewswire', function() {
     .then(function(data) { // succeed() called
       // console.dir(data);
       assert(data.type === 'Reuters', 'Ensure type is Reuters.');
-      assert(data.attachments.length === 1, 'There is one article.')
+      assert(data.attachments.length === 1, 'There is one article.');
 
       var attachment = data.attachments[0];
       assert.propertyVal(attachment, 'fallback', 'HEADLINE HEADLINE HEADLINE [2] -- BODY COPY');
       assert.propertyVal(attachment, 'color', '#ff8000');
-      assert.propertyVal(attachment, 'title', 'HEADLINE HEADLINE HEADLINE [2]');
-      assert.propertyVal(attachment, 'pretext', '@everyone');
-      assert.propertyVal(attachment, 'text', 'BODY COPY\n(Reporting by FIRSTNAME LASTNAME; writing by FIRSTNAME LASTNAME; editing by FIRSTNAME LASTNAME)');
+      assert.propertyVal(attachment, 'title', 'HEADLINE HEADLINE HEADLINE');
+      assert.propertyVal(attachment, 'pretext', undefined);
+      assert.propertyVal(attachment, 'text', 'BODY COPY\n(Reporting by FIRSTNAME LASTNAME; writing by FIRSTNAME LASTNAME; editing by FIRSTNAME LASTNAME)\n');
       assert.propertyVal(attachment, 'author_name', 'Thomson Reuters');
       assert.propertyVal(attachment, 'author_link', 'http://about.reuters.com/');
       //assert.propertyVal(attachment, 'author_icon', '');
-      assert(attachment.fields.length === 3, 'Ensure there are two fields');
+      assert(attachment.fields.length === 4, 'Ensure there are four fields');
       assert.propertyVal(attachment.fields[0], 'title', 'slugline');
       assert.propertyVal(attachment.fields[0], 'value', 'PLACE-TOPIC/SUBJECT (URGENT)');
       assert.propertyVal(attachment.fields[1], 'title', 'Methode Name');
       assert.propertyVal(attachment.fields[1], 'value', '28RTURGENT');
       assert.propertyVal(attachment.fields[2], 'title', 'News Item ID');
       assert.propertyVal(attachment.fields[2], 'value', 'ABCDEFGH');
+      assert.propertyVal(attachment.fields[3], 'title', 'Priority');
+      assert.propertyVal(attachment.fields[3], 'value', ':rotating_light: Super high priority :rotating_light:');
       done();
     })
     .catch(function(err) {

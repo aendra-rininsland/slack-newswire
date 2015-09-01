@@ -8,7 +8,7 @@
     "email": "aendrew@aendrew.com"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --no-exit test",
+    "test": "./node_modules/.bin/mocha test",
     "zip": "./node_modules/.bin/gulp zip",
     "deploy": "./node_modules/.bin/gulp deploy"
   },
@@ -21,9 +21,8 @@
   "dependencies": {
     "d3-scale": "^0.1.1",
     "dotenv": "^1.2.0",
-    "request": "^2.61.0",
-    "xml2js": "^0.4.10",
-    "xml2js-xpath": "^0.4.4"
+    "libxmljs": "^0.14.3",
+    "request": "^2.61.0"
   },
   "devDependencies": {
     "aws-lambda-mock-context": "^0.2.0",
