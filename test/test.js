@@ -29,6 +29,7 @@ describe('SlackNewswire', function() {
     index.handler({body: pressAssociation}, context());
     context.Promise
     .then(function(data) { // succeed() called
+      // console.dir(data);
       assert(data.type === 'PA', 'Ensure type is PA.');
       assert(data.attachments.length === 1, 'There is one article.');
 
@@ -37,7 +38,7 @@ describe('SlackNewswire', function() {
       assert.propertyVal(attachment, 'color', '#cce600');
       assert.propertyVal(attachment, 'title', 'HEADLINE HEADLINE');
       assert.propertyVal(attachment, 'pretext', undefined);
-      assert.propertyVal(attachment, 'text', 'BODY COPY BODY COPY\nends\n');
+      assert.propertyVal(attachment, 'text', 'BODY COPY BODY COPY\nends');
       assert.propertyVal(attachment, 'author_name', 'FIRSTNAME LASTNAME, Press Association');
       assert.propertyVal(attachment, 'author_link', 'https://www.pressassociation.com/');
       //assert.propertyVal(attachment, 'author_icon', '');
@@ -71,7 +72,7 @@ describe('SlackNewswire', function() {
       assert.propertyVal(attachment, 'color', '#ff8000');
       assert.propertyVal(attachment, 'title', 'HEADLINE HEADLINE HEADLINE');
       assert.propertyVal(attachment, 'pretext', undefined);
-      assert.propertyVal(attachment, 'text', 'BODY COPY\n(Reporting by FIRSTNAME LASTNAME; writing by FIRSTNAME LASTNAME; editing by FIRSTNAME LASTNAME)\n');
+      assert.propertyVal(attachment, 'text', 'BODY COPY\n(Reporting by FIRSTNAME LASTNAME; writing by FIRSTNAME LASTNAME; editing by FIRSTNAME LASTNAME)');
       assert.propertyVal(attachment, 'author_name', 'Thomson Reuters');
       assert.propertyVal(attachment, 'author_link', 'http://about.reuters.com/');
       //assert.propertyVal(attachment, 'author_icon', '');

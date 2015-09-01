@@ -10,7 +10,7 @@
 require('dotenv').load();
 
 // module dependencies
-var libxmljs = require('libxmljs');
+var cheerio = require('cheerio');
 var scale = require('d3-scale');
 var format = require('util').format;
 var request = require('request');
@@ -60,33 +60,41 @@ exports.handler = function(event, context) {
    * Parses an old NewsML XML file (Press Association)
    */
   function parseArticle(article, type, priority) {
-    var bodyCopy, excerpt, byline, link, newsitem, body, slugline, headline;
-
+    var bodyCopy, 
+        excerpt, 
+        byline, 
+        link, 
+        newsitem, 
+        body, 
+        slugline, 
+        headline, 
+        bodyCopyString;
+        
+    article = $(article); // wrap in Cheerio
+    
     if (type === 'PA') {
-      headline = article.get('//HeadLine').text();
-      body = article.get('//body');
-      excerpt = body.get('//body.content').childNodes()[0].text();
-      bodyCopy = '';
-      body.get('//body.content').childNodes().forEach(function(node){
-        bodyCopy += node.text() + '\n';
-      });
-      byline = article.get('//ByLine').text();
-      slugline = article.get('//SlugLine').text();
+      headline = article.find('HeadLine').text();
+      body = article.find('body').find('p');
+      excerpt = body.eq(0).text();
+      byline = article.find('ByLine').text();
+      slugline = article.find('SlugLine').text();
       link = 'https://www.pressassociation.com/';
-      newsitem = article.get('//NewsItemId').text();
+      newsitem = article.find('NewsItemId').text();
     } else if (type === 'Reuters') {
-      headline = article.get('//xmlns:headline', IPTC_NAMESPACE).text();
-      body = article.get('//xmlns:body', 'http://www.w3.org/1999/xhtml');
-      excerpt = body.childNodes()[0].text();
-      bodyCopy = '';
-      body.childNodes().forEach(function(node){
-        bodyCopy += node.text() + '\n';
-      });
+      headline = article.find('headline').text();
+      body = article.find('body').children();
+      excerpt = body.eq(0).text();
       byline = 'Thomson Reuters'; // TODO write some regex to extract reporter's name.
       link = 'http://about.reuters.com/';
-      slugline = article.get('//xmlns:slugline', IPTC_NAMESPACE).text();
-      newsitem = article.attr('guid').value().split(':')[2].replace('newsml_', '');
+      slugline = article.find('slugline').text();
+      newsitem = article.attr('guid').split(':')[2].replace('newsml_', '');
     }
+
+    bodyCopy = [];
+    body.each(function(i, node){
+      bodyCopy.push($(node).text());
+    });
+    bodyCopyString = bodyCopy.join('\n');
 
     if (byline) {
       byline = byline.replace('By ', '');
@@ -97,7 +105,7 @@ exports.handler = function(event, context) {
       color: color(priority),
       title: format('%s', headline),
       pretext: undefined, //priority <= (process.env.ALERT_PRIORITY || 3) ? '@channel' : '', // Alert everyone for priorities above 3 (default)
-      text: bodyCopy,
+      text: bodyCopyString,
       author_name: byline,
       author_link: link,
       fields: [
@@ -125,25 +133,28 @@ exports.handler = function(event, context) {
     };
   }
 
-  var xml = libxmljs.parseXmlString(event.body, {noblanks: true});
+  var $ = cheerio.load(event.body, {xmlMode: true});
   var type;
   var payload = {
     text: String(),
     attachments: []
   };
-
+  
   var articles, priority, methode;
-  if (xml.root().name() === 'newsMessage') { // Reuters, expectedly, uses the modern version.
+  var root = $.root().children('newsMessage, NewsML').get(0);
+  var xml = $(root);
+  
+  if (root.tagName === 'newsMessage') { // Reuters, expectedly, uses the modern version.
     type = 'Reuters';
-    articles = xml.find('//xmlns:newsItem', IPTC_NAMESPACE);
-    priority = xml.get('//xmlns:priority', IPTC_NAMESPACE).text();
-    methode = xml.get('//xmlns:Property[@FormalName="NIMethodeName"]', IPTC_NAMESPACE).attr('Value').value();
-  } else if (xml.root().name() === 'NewsML') { // PA, regrettably, does not.
+    articles = xml.find('newsItem');
+    priority = xml.find('priority').text();
+    methode = xml.find('Property[FormalName="NIMethodeName"]').attr('Value');
+  } else if (root.tagName === 'NewsML') { // PA, regrettably, does not.
     type = 'PA';
-    articles = xml.find('//NewsItem');
-    priority = xml.get('//Priority');
-    priority = priority.attr('FormalName').value();
-    methode = xml.get('//Property[@FormalName="NIMethodeName"]').attr('Value').value();
+    articles = xml.find('NewsItem');
+    priority = xml.find('Priority');
+    priority = priority.attr('FormalName');
+    methode = xml.find('Property[FormalName="NIMethodeName"]').attr('Value');
   } else {
     throw 'Not valid NewsML';
   }
@@ -151,7 +162,7 @@ exports.handler = function(event, context) {
   payload.type = type;
 
   if (articles.length > 0) {
-    articles.forEach(function(article){
+    articles.each(function(i, article){
       var parsed = parseArticle(article, type, priority);
       parsed.fields[1].value = methode;
       payload.attachments.push(parsed);
