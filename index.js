@@ -23,8 +23,6 @@ var environment = process.env.NODE_ENV ? process.env.NODE_ENV : 'testing';
  * @param {object}  context     The AWS Lambda execution context.
  */
 exports.handler = function(event, context) {
-  var IPTC_NAMESPACE = 'http://iptc.org/std/nar/2006-10-01/';
-
   /**
    * Returns a string value for priorities
    * @param  {integer} priority NewsML priority
