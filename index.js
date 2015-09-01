@@ -2,7 +2,7 @@
 
 /**
  * POSTs newswire stories to Slack via an incoming webhook.
- * 
+ *
  * @author Ændrew Rininsland      <aendrew@aendrew.com>
  * @since  30 Aug. 2015
  */
@@ -19,7 +19,7 @@ var environment = process.env.NODE_ENV ? process.env.NODE_ENV : 'testing';
 
 /**
  * The handler function.
- * 
+ *
  * @param {object}  event       The data regarding the event.
  * @param {object}  context     The AWS Lambda execution context.
  */
@@ -32,11 +32,16 @@ exports.handler = function(event, context) {
     var headline = xpath.evalFirst(article, '//headline');
     var body = xpath.evalFirst(article, '//body');
     var bodyCopy, excerpt, byline, link, newsitem;
-    
+
     if (body.hasOwnProperty('body.content')) { // PA
       excerpt = bodyCopy = body['body.content'][0].p[0];
       bodyCopy = body['body.content'][0].p.join('\n');
-      byline = xpath.evalFirst(article, '//byline').replace('By ', '');
+      byline = xpath.evalFirst(article, '//byline');
+
+      if (byline) {
+        byline.replace('By ', '');
+      }
+
       link = 'https://www.pressassociation.com/';
       newsitem = xpath.evalFirst(article, '//newsitemid');
     } else { // Reuters
@@ -47,7 +52,7 @@ exports.handler = function(event, context) {
       link = 'http://about.reuters.com/';
       newsitem = article.$.guid.split(':')[2].replace('newsml_', '');
     }
-    
+
     return {
       fallback: format('%s [%d] -- %s', headline, priority, excerpt),
       color: color(priority),
@@ -72,21 +77,21 @@ exports.handler = function(event, context) {
       ]
     };
   }
-  
+
   xml2js.parseString(event.body, {normalizeTags: true}, function(err, xml){
     var type;
     var payload = {
       text: String(),
       attachments: []
     };
-  
+
     var articles = xpath.find(xml, '//newsitem');
     var priority = xpath.evalFirst(xml, '//priority');
     var metadataProperties = xpath.find(xml, '//nimetadata/property');
     var methode = metadataProperties.filter(function(v){
       return v.$.FormalName === 'NIMethodeName';
     })[0].$.Value;
-      
+
     if (xml.hasOwnProperty('newsmessage')) { // Reuters, expectedly, uses the modern version.
       type = 'Reuters';
     } else if (xml.hasOwnProperty('newsml')) { // PA, regrettably, does not.
@@ -95,8 +100,9 @@ exports.handler = function(event, context) {
     } else {
       throw 'Not valid NewsML';
     }
+
     payload.type = type;
-    
+
     if (articles.length > 0) {
       articles.forEach(function(article){
         var parsed = parseArticle(article, type, priority);
@@ -104,7 +110,7 @@ exports.handler = function(event, context) {
         payload.attachments.push(parsed);
       });
     }
-    
+
     // Send to Slack
     if (environment === 'production' && process.env.hasOwnProperty('SLACK_WEBHOOK')) {
       request.post({uri: process.env.SLACK_WEBHOOK, method: 'POST', json: payload}, function (error, response, body) {
@@ -113,5 +119,5 @@ exports.handler = function(event, context) {
     } else {
       context.succeed(payload);
     }
-  });  
+  });
 };
