@@ -44,7 +44,7 @@ gulp.task('zip', function() {
 });
 
 gulp.task('upload', function(callback) {
-  return awsLambda.deploy('./dist.zip', require('./lambda-config.js'), callback);
+  awsLambda.deploy('./dist.zip', require('./lambda-config.js'), callback);
 });
 
 gulp.task('deploy', function(callback) {
