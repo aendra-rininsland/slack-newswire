@@ -8,7 +8,7 @@
     "email": "aendrew@aendrew.com"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha test",
+    "test": "./node_modules/.bin/mocha --no-exit test",
     "zip": "./node_modules/.bin/gulp zip",
     "deploy": "./node_modules/.bin/gulp deploy"
   },

@@ -2,7 +2,7 @@
 
 /**
 * Test suite for POSTs newswire stories to Slack via an incoming webhook.
-* 
+*
 * @author Ændrew Rininsland      <aendrew@aendrew.com>
 * @since  30 Aug. 2015
 */
@@ -24,14 +24,14 @@ var index = require('../');
 describe('SlackNewswire', function() {
   var pressAssociation = fs.readFileSync('test/data/press-association_mock.xml', 'UTF-8');
   var reuters = fs.readFileSync('test/data/reuters_mock.xml', 'UTF-8');
-  
+
   it('Should parse PA feeds', function(done) {
     index.handler({body: pressAssociation}, context());
     context.Promise
     .then(function(data) { // succeed() called
       assert(data.type === 'PA', 'Ensure type is PA.');
       assert(data.attachments.length === 1, 'There is one article.')
-      
+
       var attachment = data.attachments[0];
       assert.propertyVal(attachment, 'fallback', 'HEADLINE HEADLINE [4] -- BODY COPY BODY COPY');
       assert.propertyVal(attachment, 'color', '#cce600');
@@ -54,16 +54,16 @@ describe('SlackNewswire', function() {
       done(err);
     });
   });
-  
+
   it('Should parse Reuters feeds', function(done) {
     index.handler({body: reuters}, context());
-    
+
     context.Promise
     .then(function(data) { // succeed() called
       // console.dir(data);
       assert(data.type === 'Reuters', 'Ensure type is Reuters.');
       assert(data.attachments.length === 1, 'There is one article.')
-      
+
       var attachment = data.attachments[0];
       assert.propertyVal(attachment, 'fallback', 'HEADLINE HEADLINE HEADLINE [2] -- BODY COPY');
       assert.propertyVal(attachment, 'color', '#ff8000');
@@ -87,6 +87,6 @@ describe('SlackNewswire', function() {
       done(err);
     });
   });
-  
-  
+
+
 });

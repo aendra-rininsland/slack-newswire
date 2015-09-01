@@ -10,3 +10,4 @@
   "trailing": true, // Do not leave trailing whitespace.
   "validthis":true, // Allow `this` in functions.
   "white": true     // Enable scrict whitespace checking.
+}

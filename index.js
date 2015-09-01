@@ -34,8 +34,12 @@ exports.handler = function(event, context) {
     var bodyCopy, excerpt, byline, link, newsitem;
 
     if (body.hasOwnProperty('body.content')) { // PA
-      excerpt = bodyCopy = body['body.content'][0].p[0];
-      bodyCopy = body['body.content'][0].p.join('\n');
+      excerpt = xpath.jsonText(body['body.content'][0].p[0]);
+      bodyCopy = '';
+
+      body['body.content'][0].p.forEach(function(v){
+        bodyCopy += xpath.jsonText(v) + '\n';
+      });
       byline = xpath.evalFirst(article, '//byline');
 
       if (byline) {
