@@ -52,10 +52,15 @@ exports.handler = function(event, context) {
     }
   }
 
+  /**
+   * Returns a colour when a number before 1 and 8 is given.
+   * @param  {integer}    The priority you wish to get a colour for
+   * @return {string}     Hex colour code
+   */
   var color = scale.linear().domain([8, 3, 1]).range(['green', 'yellow', 'red']);
 
   /**
-   * Parses an old NewsML XML file (Press Association)
+   * Parses a NewsML XML file
    */
   function parseArticle(article, type, priority) {
     var bodyCopy, 
@@ -98,6 +103,7 @@ exports.handler = function(event, context) {
       byline = byline.replace('By ', '');
     }
 
+    // Return a Slack incoming-webhook attachment
     return {
       fallback: format('%s [%d] -- %s', headline, priority, excerpt),
       color: color(priority),
@@ -131,6 +137,7 @@ exports.handler = function(event, context) {
     };
   }
 
+  // Main program begins
   var $ = cheerio.load(event.body, {xmlMode: true});
   var type;
   var payload = {
