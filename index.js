@@ -31,23 +31,23 @@ exports.handler = function(event, context) {
   function getPriority(priority) {
     switch (parseInt(priority)) {
       case 1:
-        return ':rotating_light: CRAZY-HIGH PRIORITY :rotating_light:';
+        return '1: :rotating_light: CRAZY-HIGH PRIORITY :rotating_light:';
       case 2:
-        return ':rotating_light: Super high priority :rotating_light:';
+        return '2: :rotating_light: High priority :rotating_light:';
       case 3:
-        return 'High priority';
+        return '3: High priority';
       case 4:
-        return 'Medium priority';
+        return '4: Medium priority';
       case 5:
-        return 'Medium-low priority';
+        return '5: Medium-low priority';
       case 6:
-        return 'Low priority';
+        return '6: Low priority';
       case 7:
-        return 'Lower priority';
+        return '7: Lower priority';
       case 8:
-        return 'Lowest priority';
+        return '8: Lowest priority';
       default:
-        return 'Priority not set';
+        return '9: Priority not set';
 
     }
   }
@@ -63,18 +63,18 @@ exports.handler = function(event, context) {
    * Parses a NewsML XML file
    */
   function parseArticle(article, type, priority) {
-    var bodyCopy, 
-        excerpt, 
-        byline, 
-        link, 
-        newsitem, 
-        body, 
-        slugline, 
-        headline, 
+    var bodyCopy,
+        excerpt,
+        byline,
+        link,
+        newsitem,
+        body,
+        slugline,
+        headline,
         bodyCopyString;
-        
+
     article = $(article); // wrap in Cheerio
-    
+
     if (type === 'PA') {
       headline = article.find('HeadLine').text();
       body = article.find('body').find('p');
@@ -144,11 +144,11 @@ exports.handler = function(event, context) {
     text: String(),
     attachments: []
   };
-  
+
   var articles, priority, methode;
   var root = $.root().children('newsMessage, NewsML').get(0);
   var xml = $(root);
-  
+
   if (root.tagName === 'newsMessage') { // Reuters, expectedly, uses the modern version.
     type = 'Reuters';
     articles = xml.find('newsItem');
@@ -174,12 +174,18 @@ exports.handler = function(event, context) {
     });
   }
 
-  // Send to Slack
-  if (environment === 'production' && process.env.hasOwnProperty('SLACK_WEBHOOK')) {
-    request.post({uri: process.env.SLACK_WEBHOOK, method: 'POST', json: payload}, function (error, response, body) {
-      context.succeed(body);
-    });
+  // Check if passes minimum priority
+  if (!process.env.MIN_PRIORITY ||
+      (process.env.MIN_PRIORITY && Number(payload.attachments[0].fields[3].value.split(':')[0]) <= process.env.MIN_PRIORITY)) {
+    // Send to Slack
+    if (environment === 'production' && process.env.hasOwnProperty('SLACK_WEBHOOK')) {
+      request.post({uri: process.env.SLACK_WEBHOOK, method: 'POST', json: payload}, function (error, response, body) {
+        context.succeed(body);
+      });
+    } else {
+      context.succeed(payload);
+    }
   } else {
-    context.succeed(payload);
+    context.fail('Below priority threshold');
   }
 };

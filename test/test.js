@@ -50,7 +50,7 @@ describe('SlackNewswire', function() {
       assert.propertyVal(attachment.fields[2], 'title', 'News Item ID');
       assert.propertyVal(attachment.fields[2], 'value', 'PA-HHH-POLICE-Collision');
       assert.propertyVal(attachment.fields[3], 'title', 'Priority');
-      assert.propertyVal(attachment.fields[3], 'value', 'Medium priority');
+      assert.propertyVal(attachment.fields[3], 'value', '4: Medium priority');
       done();
     })
     .catch(function(err) { // fail() called
@@ -63,7 +63,6 @@ describe('SlackNewswire', function() {
 
     context.Promise
     .then(function(data) { // succeed() called
-      // console.dir(data);
       assert(data.type === 'Reuters', 'Ensure type is Reuters.');
       assert(data.attachments.length === 1, 'There is one article.');
 
@@ -84,7 +83,7 @@ describe('SlackNewswire', function() {
       assert.propertyVal(attachment.fields[2], 'title', 'News Item ID');
       assert.propertyVal(attachment.fields[2], 'value', 'ABCDEFGH');
       assert.propertyVal(attachment.fields[3], 'title', 'Priority');
-      assert.propertyVal(attachment.fields[3], 'value', ':rotating_light: Super high priority :rotating_light:');
+      assert.propertyVal(attachment.fields[3], 'value', '2: :rotating_light: High priority :rotating_light:');
       done();
     })
     .catch(function(err) {
@@ -93,5 +92,29 @@ describe('SlackNewswire', function() {
     });
   });
 
+  it('Should respect the MIN_PRIORITY environment variable.', function(done){
+    process.env.MIN_PRIORITY = 3; // Set min-priority to 3.
 
+    index.handler({body: reuters}, context()); // Reuters is P2.
+    context.Promise
+    .then(function(data) {
+      assert(data.attachments.length > 0, 'Ensure there are attachments.');
+    })
+    .catch(function(err) {
+        // fail() called
+        done(err);
+      });
+
+    index.handler({body: pressAssociation}, context()); // PA is P4.
+    context.Promise
+    .then(function(data) {
+      // Shouldn't be any data. I don't think this assertion should ever run.
+      assert.isUndefined(data);
+    })
+    .catch(function(err) {
+      // fail() called
+      assert.equal(err, 'Below priority threshold', 'Should not post statuses below threshold.');
+      done();
+    });
+  });
 });
