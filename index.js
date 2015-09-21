@@ -99,6 +99,8 @@ exports.handler = function(event, context) {
     });
     bodyCopyString = bodyCopy.join('\n');
 
+    if (bodyCopyString.length === 0) return;
+
     if (byline) {
       byline = byline.replace('By ', '');
     }
