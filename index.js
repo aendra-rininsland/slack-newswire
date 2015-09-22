@@ -174,11 +174,22 @@ exports.handler = function(event, context) {
       parsed.fields[1].value = methode;
       payload.attachments.push(parsed);
     });
+  } else {
+    context.fail('No articles found.');
   }
 
   // Check if passes minimum priority
   if (!process.env.MIN_PRIORITY ||
-      (process.env.MIN_PRIORITY && Number(payload.attachments[0].fields[3].value.split(':')[0]) <= process.env.MIN_PRIORITY)) {
+      (process.env.MIN_PRIORITY && Number(priority) <= process.env.MIN_PRIORITY)) {
+
+    // Send debug output if NODE_DEBUG env var is true.
+    if (process.env.NODE_DEBUG && process.env.NODE_DEBUG === 'true') {
+      console.log('---- Payload ----');
+      console.dir(payload);
+      console.log('\n---- Input ----');
+      console.log(event.body);
+    }
+
     // Send to Slack
     if (environment === 'production' && process.env.hasOwnProperty('SLACK_WEBHOOK')) {
       request.post({uri: process.env.SLACK_WEBHOOK, method: 'POST', json: payload}, function (error, response, body) {

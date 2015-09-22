@@ -20,10 +20,16 @@ chai.should();
 chai.use(sinonChai);
 
 var index = require('../');
+var pressAssociation = fs.readFileSync('test/data/press-association_mock.xml', 'UTF-8');
+var reuters = fs.readFileSync('test/data/reuters_mock.xml', 'UTF-8');
+
+process.env.NODE_ENV = 'devel'; // Ensure env is devel to prevent accidental posting.
 
 describe('SlackNewswire', function() {
-  var pressAssociation = fs.readFileSync('test/data/press-association_mock.xml', 'UTF-8');
-  var reuters = fs.readFileSync('test/data/reuters_mock.xml', 'UTF-8');
+  beforeEach(function() {
+    delete process.env.MIN_PRIORITY;
+    process.env.NODE_DEBUG = false;
+  });
 
   it('Should parse PA feeds', function(done) {
     index.handler({body: pressAssociation}, context());
@@ -103,7 +109,7 @@ describe('SlackNewswire', function() {
     .catch(function(err) {
         // fail() called
         done(err);
-      });
+    });
 
     index.handler({body: pressAssociation}, context()); // PA is P4.
     context.Promise
@@ -115,6 +121,72 @@ describe('SlackNewswire', function() {
       // fail() called
       assert.equal(err, 'Below priority threshold', 'Should not post statuses below threshold.');
       done();
+    });
+  });
+});
+
+describe('SlackNewswire with env var NODE_DEBUG', function(){
+  // This allows us to spy on the console. Using stubs suppresses the output.
+  beforeEach(function() {
+    sinon.stub(console, 'log').returns(void 0);
+    sinon.stub(console, 'dir').returns(void 0);
+
+    // Comment out the above and uncomment these if you need to use console.log/dir
+    // when debugging this spec.
+    // sinon.spy(console, 'log');
+    // sinon.spy(console, 'dir');
+  });
+
+  afterEach(function() {
+    console.log.restore();
+    console.dir.restore();
+  });
+
+  it('Should output debug information if NODE_DEBUG=true', function(done){
+    process.env.NODE_DEBUG = true; // Set DEBUG to true.
+
+    index.handler({body: reuters}, context());
+    context.Promise
+    .then(function(data) {
+      assert.equal(console.log.callCount, 3);
+      assert.equal(console.dir.callCount, 1);
+      done();
+    })
+    .catch(function(err) {
+        // fail() called
+        done(err);
+    });
+  });
+
+  it('Should suppress debug information if NODE_DEBUG=false', function(done){
+    process.env.NODE_DEBUG = false; // Set DEBUG to false.
+
+    index.handler({body: reuters}, context());
+    context.Promise
+    .then(function(data) {
+      assert.isFalse(console.log.called);
+      assert.isFalse(console.dir.called);
+      done();
+    })
+    .catch(function(err) {
+      // fail() called
+      done(err);
+    });
+  });
+
+  it('Should suppress debug information if NODE_DEBUG=undefined', function(done){
+    process.env.NODE_DEBUG = undefined; // Set DEBUG to undefined
+
+    index.handler({body: reuters}, context());
+    context.Promise
+    .then(function(data) {
+      assert.isFalse(console.log.called);
+      assert.isFalse(console.dir.called);
+      done();
+    })
+    .catch(function(err) {
+      // fail() called
+      done(err);
     });
   });
 });
